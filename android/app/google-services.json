@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "573703947559",
+    "project_id": "adisyona",
+    "storage_bucket": "adisyona.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573703947559:android:a5619e53407096efdad502",
+        "android_client_info": {
+          "package_name": "com.example.adisyona"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHfhXXHdX1BHoqAwom-iLm1ntz8ZJ2YWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

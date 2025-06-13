@@ -1,4 +1,5 @@
 import 'package:adisyona/views/dashboard/admin_dashboard.dart';
+import 'package:adisyona/views/kitchen/kitchen_screen.dart';
 import 'package:adisyona/views/order/order_table_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'product_management_view.dart';
@@ -29,7 +30,18 @@ class AdminDashboardMenu extends StatelessWidget {
         ),
       ),
       _MenuItem(title: 'Sipariş', icon: Icons.receipt_long, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderTableSelectionScreen()))),
-      // Gelecekte başka butonlar da ekleyebilirsin (örneğin raporlar, garson ekleme vs)
+      _MenuItem(
+        title: 'Mutfak',
+        icon: Icons.kitchen_outlined,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const KitchenScreen(), // Assuming you have a KitchenScreen
+            ),
+          );
+        },
+      ),
     ];
 
     return Scaffold(

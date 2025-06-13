@@ -74,7 +74,7 @@ class ProductProvider with ChangeNotifier {
           .where('companyId', isEqualTo: companyId)
           .get();
 
-      _categories = catSnap.docs.map((e) => Category.fromMap(e.id, e.data() as Map<String, dynamic>)).toList();
+      _categories = catSnap.docs.map((e) => Category.fromMap(e.id, e.data())).toList();
       _products = prodSnap.docs.map((e) => Product.fromMap(e.id, e.data() as Map<String, dynamic>)).toList();
 
       // Eğer seçili kategori yoksa ve kategoriler varsa ilkini seç

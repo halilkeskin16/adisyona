@@ -18,6 +18,7 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
   List<Area> _areas = [];
   List<TableModel> _tables = [];
   String _selectedAreaId = 'all';
+  Map<String, double> _tableOrders = {}; // Masa ID'si -> Toplam Sipariş Tutarı
 
   @override
   void initState() {
@@ -40,9 +41,38 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
           .where('companyId', isEqualTo: user.companyId)
           .get();
 
+      // Aktif siparişleri yükle
+      final ordersSnap = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('companyId', isEqualTo: user.companyId)
+          .where('status', whereIn: ['pending', 'preparing', 'ready'])
+          .get();
+
+      // Her masa için toplam sipariş tutarını hesapla
+      Map<String, double> tableOrders = {};
+      for (var doc in ordersSnap.docs) {
+        final data = doc.data();
+        final tableId = data['tableId'] as String;
+        // totalAmount null olabilir, bu durumda items'dan hesapla
+        double totalAmount = 0.0;
+        if (data['totalAmount'] != null) {
+          totalAmount = (data['totalAmount'] as num).toDouble();
+        } else if (data['items'] != null) {
+          // Eğer totalAmount yoksa items'dan hesapla
+          final items = data['items'] as List;
+          totalAmount = items.fold(0.0, (sum, item) {
+            final price = (item['price'] as num).toDouble();
+            final quantity = (item['quantity'] as num).toInt();
+            return sum + (price * quantity);
+          });
+        }
+        tableOrders[tableId] = (tableOrders[tableId] ?? 0) + totalAmount;
+      }
+
       setState(() {
         _areas = areaSnap.docs.map((doc) => Area.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList();
         _tables = tableSnap.docs.map((doc) => TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList();
+        _tableOrders = tableOrders;
       });
     } catch (e) {
       debugPrint('Hata: $e');
@@ -52,6 +82,15 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
   List<TableModel> get _filteredTables {
     if (_selectedAreaId == 'all') return _tables;
     return _tables.where((t) => t.areaId == _selectedAreaId).toList();
+  }
+
+  Color _getTableColor(String tableId) {
+    if (_tableOrders.containsKey(tableId)) {
+      // Sipariş varsa kırmızı tonları
+      return Colors.red.shade100;
+    }
+    // Sipariş yoksa yeşil tonları
+    return Colors.green.shade100;
   }
 
   @override
@@ -89,36 +128,60 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
               child: GridView.builder(
                 itemCount: _filteredTables.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2'li grid
+                  crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   childAspectRatio: 1.2,
                 ),
                 itemBuilder: (context, index) {
                   final table = _filteredTables[index];
-                  final areaName = _areas.firstWhere((a) => a.id == table.areaId, orElse: () => Area(id: '', name: '' , companyId: '')).name;
+                  final areaName = _areas.firstWhere((a) => a.id == table.areaId, orElse: () => Area(id: '', name: '', companyId: '')).name;
+                  final hasOrder = _tableOrders.containsKey(table.id);
+                  final orderAmount = _tableOrders[table.id] ?? 0.0;
 
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (_) => OrderFormScreen(tableId: table.id, tableName: table.name),
-                      ));
+                      )).then((_) => _loadAreasAndTables()); // Geri dönüşte masaları yenile
                     },
                     child: Card(
                       elevation: 4,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      color: colorScheme.surfaceVariant,
+                      color: _getTableColor(table.id),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.table_bar, size: 40, color: colorScheme.primary),
+                            Icon(
+                              hasOrder ? Icons.table_restaurant : Icons.table_bar,
+                              size: 40,
+                              color: hasOrder ? Colors.red.shade700 : Colors.green.shade700,
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               table.name,
-                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: hasOrder ? Colors.red.shade900 : Colors.green.shade900,
+                              ),
                             ),
-                            Text(areaName, style: textTheme.bodySmall),
+                            Text(
+                              areaName,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: hasOrder ? Colors.red.shade900 : Colors.green.shade900,
+                              ),
+                            ),
+                            if (hasOrder) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                '${orderAmount.toStringAsFixed(2)} ₺',
+                                style: textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red.shade900,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),

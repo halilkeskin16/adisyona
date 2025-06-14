@@ -1,13 +1,15 @@
-import 'package:adisyona/models/order_model.dart';
-import 'package:adisyona/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/category_model.dart';
-import '../../models/product_model.dart';
+import '../../models/order_model.dart';
+import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/order_provider.dart'; // Yeni ProductProvider
-import '../../providers/product_provider.dart'; // Yeni OrderProvider
+import '../../providers/order_provider.dart';
+import '../../providers/product_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// DİKKAT: Bu dosyadaki geçici OrderItem ve AppUser modeli tanımları KALDIRILDI.
+// Lütfen OrderItem ve AppUser sınıflarının tanımının sadece kendi model dosyalarında olduğundan emin olun.
+
 
 class OrderFormScreen extends StatefulWidget {
   final String tableId;
@@ -26,23 +28,31 @@ class OrderFormScreen extends StatefulWidget {
 class _OrderFormScreenState extends State<OrderFormScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isInitialized = false;
+  OrderProvider? _orderProviderInstance; // OrderProvider örneğini saklamak için yeni değişken
+  ProductProvider? _productProviderInstance; // ProductProvider örneğini saklamak için yeni değişken
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isInitialized) {
       final user = Provider.of<AuthProvider>(context, listen: false).user;
-      final productProvider = Provider.of<ProductProvider>(context, listen: false);
+      _productProviderInstance = Provider.of<ProductProvider>(context, listen: false); // ProductProvider örneğini burada al
+      _orderProviderInstance = Provider.of<OrderProvider>(context, listen: false); // OrderProvider örneğini burada al
 
-      if (user != null) {
-        Future.microtask(() {
-          productProvider.fetchData(user.companyId!);
+      if (user != null && user.companyId != null) {
+        // WidgetsBinding.instance.addPostFrameCallback kullanarak kodu bir sonraki kare çizildikten sonra çalıştır
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          // Ürün ve kategorileri yükle
+          await _productProviderInstance!.fetchData(user.companyId!);
+          // Masaya ait mevcut siparişi yükle
+          await _orderProviderInstance!.fetchOrderForTable(tableId: widget.tableId, companyId: user.companyId!);
         });
       }
 
       // Arama kontrolcüsünü ProductProvider'ın setSearchText metoduna bağla
       _searchController.addListener(() {
-        productProvider.setSearchText(_searchController.text);
+        _productProviderInstance!.setSearchText(_searchController.text); // Saklanan örneği kullan
       });
 
       _isInitialized = true;
@@ -52,6 +62,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    // Ekran kapatıldığında OrderProvider'ın state'ini temizle
+    // Güvenli bir şekilde saklanan Provider örneği kullanılıyor ve WidgetsBinding kullanılarak ertelendi
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _orderProviderInstance?.clearOrder();
+    });
     super.dispose();
   }
 
@@ -59,7 +74,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
     final orderProvider = Provider.of<OrderProvider>(context);
-    final user = Provider.of<AuthProvider>(context, listen: false).user;
+    final user = Provider.of<AuthProvider>(context, listen: false).user; // AppUser tipi için
 
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -149,8 +164,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               // Ürünler listesi
               Container(
                 constraints: BoxConstraints(
-                  // Ekran yüksekliğinin %40'ı kadar max yükseklik, kaydırma etkinleştirildi
-                  maxHeight: MediaQuery.of(context).size.height * 0.4,
+                  maxHeight: MediaQuery.of(context).size.height * 0.4, // Ekran yüksekliğinin %40'ı kadar max yükseklik, kaydırma etkinleştirildi
                 ),
                 child: productProvider.isLoading && productProvider.filteredProducts.isEmpty && productProvider.categories.isNotEmpty
                     ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
@@ -274,6 +288,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               name: product.name,
               price: product.price,
               quantity: 1, // Yeni eklenen ürünün başlangıç miktarı
+              status: 'pending', // Yeni sipariş öğesinin başlangıç durumu
             )), // Tıklama ile ürünü ekle/miktar artır
             child: Card(
               elevation: isProductSelected ? 6 : 3, // Seçiliyse daha belirgin gölge
@@ -383,7 +398,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   Widget _buildSelectedItemsList(ColorScheme colorScheme, TextTheme textTheme, OrderProvider orderProvider) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: const ClampingScrollPhysics(), // Kaydırma özelliğini etkinleştirdim
+      physics: const ClampingScrollPhysics(),
       itemCount: orderProvider.selectedItems.length,
       itemBuilder: (context, index) {
         final item = orderProvider.selectedItems[index];
@@ -393,9 +408,17 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           color: colorScheme.surfaceVariant,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // Daha küçük padding
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(
               children: [
+                // Seçim kutusu
+                Checkbox(
+                  value: orderProvider.isItemSelectedForPayment(item),
+                  onChanged: (bool? value) {
+                    orderProvider.toggleItemSelectionForPayment(item);
+                  },
+                  activeColor: colorScheme.primary,
+                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,14 +428,14 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                         style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
-                          fontSize: 13, // Font büyüklüğünü daha da düşürdüm
+                          fontSize: 13,
                         ),
                       ),
                       Text(
                         "${item.price.toStringAsFixed(2)} ₺",
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.7),
-                          fontSize: 11, // Font büyüklüğünü daha da düşürdüm
+                          fontSize: 11,
                         ),
                       ),
                     ],
@@ -422,34 +445,34 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.remove_circle_outline, color: colorScheme.error, size: 20), // İkon boyutu
+                      icon: Icon(Icons.remove_circle_outline, color: colorScheme.error, size: 20),
                       onPressed: () => orderProvider.decreaseQty(item),
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28), // Buton boyutu
+                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                     ),
                     Text(
                       item.quantity.toString(),
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
-                        fontSize: 13, // Font büyüklüğünü düşürdüm
+                        fontSize: 13,
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.add_circle_outline, color: colorScheme.primary, size: 20), // İkon boyutu
+                      icon: Icon(Icons.add_circle_outline, color: colorScheme.primary, size: 20),
                       onPressed: () => orderProvider.increaseQty(item),
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28), // Buton boyutu
+                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: Icon(Icons.delete_outline, color: colorScheme.error, size: 20), // İkon boyutu
+                      icon: Icon(Icons.delete_outline, color: colorScheme.error, size: 20),
                       onPressed: () => orderProvider.removeItem(item),
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28), // Buton boyutu
+                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                     ),
                   ],
                 ),
@@ -477,137 +500,208 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // İçeriğine göre boyutlan
+        mainAxisSize: MainAxisSize.min,
         children: [
+          // Seçili ürünlerin listesi
+          Consumer<OrderProvider>(
+            builder: (context, orderProvider, child) {
+              final selectedItems = orderProvider.getSelectedItemsForPayment();
+              final totalAmount = orderProvider.calculateTotalPrice(selectedItems);
+              
+              return Column(
+                children: [
+                  // Seçili ürünler
+                  ...orderProvider.selectedItems.map((item) {
+                    final isCompleted = item.status == 'completed';
+                    return CheckboxListTile(
+                      title: Text(
+                        item.name,
+                        style: TextStyle(
+                          decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          color: isCompleted ? Colors.grey : null,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${item.quantity} adet x ${item.price.toStringAsFixed(2)} TL',
+                        style: TextStyle(
+                          color: isCompleted ? Colors.grey : null,
+                        ),
+                      ),
+                      value: orderProvider.isItemSelectedForPayment(item),
+                      onChanged: isCompleted ? null : (bool? value) {
+                        orderProvider.toggleItemSelectionForPayment(item);
+                      },
+                      secondary: Text(
+                        '${(item.price * item.quantity).toStringAsFixed(2)} TL',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isCompleted ? Colors.grey : colorScheme.primary,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  const Divider(),
+                  // Toplam tutar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Seçili Ürünler Toplamı:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                        Text(
+                          '${totalAmount.toStringAsFixed(2)} TL',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Toplam",
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                      fontSize: 14, // Font büyüklüğü
-                    ),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+                    if (orderProvider.selectedItems.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Lütfen en az bir ürün seçin')),
+                      );
+                      return;
+                    }
+                    orderProvider.submitOrder(
+                      tableId: widget.tableId,
+                      tableName: widget.tableName,
+                      companyId: user?.companyId ?? '',
+                      onSuccess: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Sipariş "${widget.tableName}" masasına gönderildi!'),
+                            backgroundColor: colorScheme.primary,
+                          ),
+                        );
+                        Navigator.pop(context);
+                      },
+                      onError: (msg) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(msg), backgroundColor: colorScheme.error),
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.send),
+                  label: const Text('Siparişi Gönder'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  Text(
-                    "${orderProvider.totalPrice.toStringAsFixed(2)} ₺",
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                      fontSize: 22, // Font büyüklüğü
-                    ),
-                  ),
-                ],
+                ),
               ),
-              // İsteğe bağlı olarak "Ödenen" ve "Kalan" alanları eklenebilir
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Ödenen",
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                      fontSize: 14,
-                    ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+                    final selectedItems = orderProvider.getSelectedItemsForPayment();
+                    if (selectedItems.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Lütfen ödenecek ürünleri seçin')),
+                      );
+                      return;
+                    }
+                    _showPaymentDialog(selectedItems);
+                  },
+                  icon: const Icon(Icons.payment),
+                  label: const Text('Hesap Al'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  Text(
-                    "0,00 ₺", // Örnek değer
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.secondary,
-                      fontSize: 22,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Kalan",
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                      fontSize: 14,
-                    ),
-                  ),
-                  Text(
-                    "0,00 ₺", // Örnek değer
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.error,
-                      fontSize: 22,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          // Seçilen ürünler listesi (sadece seçili ürünler varsa görünür)
-          if (orderProvider.selectedItems.isNotEmpty) ...[
-            // Sipariş edilen ürünlerin listesini içeren Container
-            Container(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.2), // Ekran yüksekliğinin %20'si kadar bir max yükseklik verdim
-              child: _buildSelectedItemsList(colorScheme, textTheme, orderProvider),
-            ),
-            const SizedBox(height: 16),
-          ],
-          // Sipariş Gönder Butonu (burada zaten çağrılıyor)
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: orderProvider.isLoading
-                  ? null
-                  : () {
-                      orderProvider.submitOrder(
-                        tableId: widget.tableId,
-                        tableName: widget.tableName,
-                        companyId: user?.companyId ?? '',
-                        onSuccess: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text('Sipariş "${widget.tableName}" masasına gönderildi!'),
-                                backgroundColor: colorScheme.primary,
-                            ),
-                          );
-                          Navigator.pop(context);
-                        },
-                        onError: (msg) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(msg), backgroundColor: colorScheme.error),
-                          );
-                        },
-                      );
-                    },
-              icon: orderProvider.isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                    )
-                  : Icon(Icons.send, color: colorScheme.onPrimary),
-              label: Text(
-                "Siparişi Gönder (${orderProvider.selectedItems.length})",
-                style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.secondary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 5,
-              ),
-            ),
           ),
         ],
       ),
     );
+  }
+
+  void _showPaymentDialog(List<OrderItem> selectedItems) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ödeme Yöntemi Seçin'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Seçili Ürünler:'),
+            const SizedBox(height: 8),
+            ...selectedItems.map((item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text('${item.name} x${item.quantity} - ${(item.price * item.quantity).toStringAsFixed(2)} TL'),
+            )),
+            const Divider(),
+            Text(
+              'Toplam: ${selectedItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity)).toStringAsFixed(2)} TL',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () => _processPayment('cash', selectedItems),
+            child: const Text('Nakit'),
+          ),
+          ElevatedButton(
+            onPressed: () => _processPayment('card', selectedItems),
+            child: const Text('Kart'),
+          ),
+          ElevatedButton(
+            onPressed: () => _processPayment('meal_card', selectedItems),
+            child: const Text('Yemek Kartı'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _processPayment(String paymentMethod, List<OrderItem> selectedItems) async {
+    try {
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+      await orderProvider.processPayment(paymentMethod, selectedItems);
+
+      if (mounted) {
+        Navigator.pop(context); // Ödeme dialogunu kapat
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ödeme başarıyla tamamlandı')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ödeme işlemi sırasında hata oluştu: $e')),
+        );
+      }
+    }
   }
 }

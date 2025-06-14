@@ -7,8 +7,12 @@ class OrderModel {
   final String tableName;
   final List<OrderItem> items;
   final String companyId;
-  final DateTime createdAt;
+  final Timestamp? createdAt;
   final String status; // örnek: pending, preparing, served
+  final double totalAmount;
+  final String? paymentMethod;
+  final Timestamp? paymentDate;
+  final Timestamp? kitchenCompletedAt;
 
   OrderModel({
     required this.id,
@@ -16,19 +20,30 @@ class OrderModel {
     required this.tableName,
     required this.items,
     required this.companyId,
-    required this.createdAt,
+    this.createdAt,
     required this.status,
+    required this.totalAmount,
+    this.paymentMethod,
+    this.paymentDate,
+    this.kitchenCompletedAt,
   });
 
-  factory OrderModel.fromMap(String id, Map<String, dynamic> data) {
+  factory OrderModel.fromMap(String id, Map<String, dynamic> map) {
     return OrderModel(
       id: id,
-      tableId: data['tableId'],
-      tableName: data['tableName'],
-      companyId: data['companyId'],
-      status: data['status'] ?? 'pending',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      items: (data['items'] as List<dynamic>).map((item) => OrderItem.fromMap(item as Map<String, dynamic>)).toList(),
+      tableId: map['tableId'] ?? '',
+      tableName: map['tableName'] ?? '',
+      items: (map['items'] as List<dynamic>?)
+              ?.map((item) => OrderItem.fromMap(item as Map<String, dynamic>))
+              .toList() ??
+          [],
+      companyId: map['companyId'] ?? '',
+      createdAt: map['createdAt'] as Timestamp?,
+      status: map['status'] ?? 'pending',
+      totalAmount: (map['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      paymentMethod: map['paymentMethod'] as String?,
+      paymentDate: map['paymentDate'] as Timestamp?,
+      kitchenCompletedAt: map['kitchenCompletedAt'] as Timestamp?,
     );
   }
 
@@ -36,10 +51,14 @@ class OrderModel {
     return {
       'tableId': tableId,
       'tableName': tableName,
-      'companyId': companyId,
-      'createdAt': Timestamp.fromDate(createdAt), // Firestore'a Timestamp olarak kaydet
-      'status': status,
       'items': items.map((item) => item.toMap()).toList(),
+      'companyId': companyId,
+      'createdAt': createdAt,
+      'status': status,
+      'totalAmount': totalAmount,
+      'paymentMethod': paymentMethod,
+      'paymentDate': paymentDate,
+      'kitchenCompletedAt': kitchenCompletedAt,
     };
   }
 }
@@ -48,32 +67,34 @@ class OrderItem {
   final String productId;
   final String name;
   final double price;
-  int quantity;
-  String? status; // <<< BURADAKİ FINAL KALDIRILDI VE ALAN EKLENDİ
+  final int quantity;
+  final String status;
 
   OrderItem({
     required this.productId,
     required this.name,
     required this.price,
-    this.quantity = 1,
-    this.status, // <<< CONSTRUCTOR'A EKLENDİ
+    required this.quantity,
+    required this.status,
   });
-
-  Map<String, dynamic> toMap() => {
-        'productId': productId,
-        'name': name,
-        'price': price,
-        'quantity': quantity,
-        'status': status, // <<< toMap METODUNA EKLENDİ
-      };
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
-      productId: map['productId'] as String, // String cast eklendi
-      name: map['name'] as String, // String cast eklendi
-      price: (map['price'] as num).toDouble(),
-      quantity: (map['quantity'] as num).toInt(), // int cast eklendi
-      status: map['status'] as String?, // <<< fromMap METODUNA EKLENDİ
+      productId: map['productId'] ?? '',
+      name: map['name'] ?? '',
+      price: (map['price'] as num?)?.toDouble() ?? 0.0,
+      quantity: map['quantity'] ?? 0,
+      status: map['status'] ?? 'pending',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'name': name,
+      'price': price,
+      'quantity': quantity,
+      'status': status,
+    };
   }
 }

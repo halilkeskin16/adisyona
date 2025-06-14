@@ -69,7 +69,7 @@ class _LoginViewState extends State<LoginView> {
           context,
           MaterialPageRoute(builder: (_) => const SuperAdminDashboard()),
         );
-      } else if (user.role == "admin") {
+      } else if (user.role == "admin" || user.role == "garson") {
         // Admin ise şirket aboneliği geçerliliğini kontrol et
         final isValid = await authProvider.isCompanyValid(user.companyId!);
 

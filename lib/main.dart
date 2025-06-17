@@ -1,5 +1,6 @@
 import 'package:adisyona/providers/order_provider.dart';
 import 'package:adisyona/providers/product_provider.dart';
+import 'package:adisyona/providers/reports_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,7 @@ class AdisyonaApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create:  (_) => ProductProvider()), 
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => ReportsProvider()), // OrderProvider'ı ekledik
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

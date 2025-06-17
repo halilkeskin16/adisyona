@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/order_model.dart'; // OrderModel ve OrderItem'ı buradan import etmeli!
+import '../models/sales_record_model.dart'; // <<< YENİ: SalesRecord modelini import etmeli!
 
 class OrderProvider with ChangeNotifier {
   List<OrderItem> _selectedItems = []; // Masadaki tüm sipariş öğeleri
@@ -184,7 +185,7 @@ class OrderProvider with ChangeNotifier {
     _selectedItems.clear();
     _selectedItemsForPayment.clear();
     _selectedItemsForTransfer.clear();
-    _safeNotifyListeners(); // Yükleme durumu ve boş listeleri göstermek için notify
+    _safeNotifyListeners();
 
     try {
       final querySnapshot = await FirebaseFirestore.instance
@@ -197,7 +198,7 @@ class OrderProvider with ChangeNotifier {
 
       if (querySnapshot.docs.isNotEmpty) {
         final doc = querySnapshot.docs.first;
-        final order = OrderModel.fromMap(doc.id, doc.data());
+        final order = OrderModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
         _selectedItems = List<OrderItem>.from(order.items);
         _currentOrderId = order.id;
         _currentOrderModel = order;
@@ -208,13 +209,13 @@ class OrderProvider with ChangeNotifier {
         _currentOrderModel = null;
         _message = "Bu masa için aktif sipariş bulunamadı. Yeni bir sipariş başlatılıyor.";
       }
-      _calculateTotals(); // Total hesaplar ve notify eder
+      _calculateTotals();
     } catch (e) {
       _message = "Masa siparişi yüklenirken hata oluştu: $e";
       print(_message);
     } finally {
       _isLoading = false;
-      _safeNotifyListeners(); // Yükleme bittiğini ve mesajı göstermek için notify
+      _safeNotifyListeners();
     }
   }
 
@@ -234,7 +235,7 @@ class OrderProvider with ChangeNotifier {
 
     _isLoading = true;
     _message = null;
-    _safeNotifyListeners(); // Yükleme durumunu göstermek için notify
+    _safeNotifyListeners();
 
     try {
       final orderData = {
@@ -258,14 +259,13 @@ class OrderProvider with ChangeNotifier {
         _message = "Yeni sipariş başarıyla oluşturuldu!";
       }
 
-      onSuccess(); // UI'da pop() gibi işlemleri tetikleyebilir
-
+      onSuccess();
     } catch (e) {
       _message = "Sipariş gönderilirken hata oluştu: $e";
       onError(_message!);
     } finally {
       _isLoading = false;
-      _safeNotifyListeners(); // İşlem bittiğini ve mesajı göstermek için notify
+      _safeNotifyListeners();
     }
   }
 
@@ -284,7 +284,7 @@ class OrderProvider with ChangeNotifier {
 
     _isLoading = true;
     _message = null;
-    _safeNotifyListeners(); // Yükleme durumunu göstermek için notify
+    _safeNotifyListeners();
 
     try {
       final orderDocRef = FirebaseFirestore.instance.collection('orders').doc(_currentOrderId);
@@ -316,6 +316,7 @@ class OrderProvider with ChangeNotifier {
 
       bool allItemsCompletedInOrder = updatedItems.every((item) => item.status == 'completed');
 
+      // Siparişi Firestore'da güncelle
       await orderDocRef.update({
         'items': updatedItems.map((e) => e.toMap()).toList(),
         'paymentMethod': paymentMethod,
@@ -323,6 +324,28 @@ class OrderProvider with ChangeNotifier {
         'status': allItemsCompletedInOrder ? 'completed' : 'pending',
         'totalAmount': calculateTotalPrice(_selectedItems),
       });
+
+      // Eğer tüm ürünler ödendiyse, sales_records'a kaydet
+      if (allItemsCompletedInOrder && _currentOrderModel != null) {
+        await FirebaseFirestore.instance.collection('sales_records').add(SalesRecord(
+          id: '', // Firestore tarafından atanacak
+          orderId: _currentOrderId!,
+          companyId: _currentOrderModel!.companyId,
+          staffId: _currentOrderModel!.staffId ?? 'unknown',
+          tableId: _currentOrderModel!.tableId,
+          tableName: _currentOrderModel!.tableName,
+          totalAmount: _totalPrice,
+          paymentMethod: paymentMethod,
+          transactionDate: FieldValue.serverTimestamp() as Timestamp, // Timestamp FieldValue'dan cast
+          itemsSummary: updatedItems.map((item) => {
+            'productId': item.productId,
+            'name': item.name,
+            'quantity': item.quantity,
+            'price': item.price,
+          }).toList(),
+        ).toMap());
+      }
+
 
       _selectedItems = updatedItems;
       _selectedItemsForPayment.clear();
@@ -334,7 +357,7 @@ class OrderProvider with ChangeNotifier {
       print(_message);
     } finally {
       _isLoading = false;
-      _safeNotifyListeners(); // İşlem bittiğini ve mesajı göstermek için notify
+      _safeNotifyListeners();
     }
   }
 
@@ -359,7 +382,7 @@ class OrderProvider with ChangeNotifier {
 
     _isLoading = true;
     _message = null;
-    _safeNotifyListeners(); // Yükleme durumunu göstermek için notify
+    _safeNotifyListeners();
 
     WriteBatch batch = FirebaseFirestore.instance.batch();
 
@@ -370,16 +393,14 @@ class OrderProvider with ChangeNotifier {
       remainingItems.removeWhere((item) => itemsToTransfer.any((tItem) => tItem.uniqueId == item.uniqueId));
 
       if (remainingItems.isEmpty) {
-        // If no items left, close the source order
         batch.update(sourceOrderRef, {
           'items': [],
-          'status': 'transferred_out', // Yeni durum: Taşındı
+          'status': 'transferred_out',
           'totalAmount': 0.0,
           'transferredAt': FieldValue.serverTimestamp(),
           'transferredToTable': targetTableId,
         });
       } else {
-        // Update source order with remaining items
         batch.update(sourceOrderRef, {
           'items': remainingItems.map((item) => item.toMap()).toList(),
           'totalAmount': calculateTotalPrice(remainingItems),
@@ -387,7 +408,6 @@ class OrderProvider with ChangeNotifier {
       }
 
       // Phase 2: Update/Create Target Order
-      // Check if target table already has a 'pending' order
       QuerySnapshot targetOrderSnapshot = await FirebaseFirestore.instance
           .collection('orders')
           .where('tableId', isEqualTo: targetTableId)
@@ -397,7 +417,6 @@ class OrderProvider with ChangeNotifier {
           .get();
 
       if (targetOrderSnapshot.docs.isNotEmpty) {
-        // Target table has an active order, append items
         DocumentReference targetOrderRef = targetOrderSnapshot.docs.first.reference;
         OrderModel targetOrder = OrderModel.fromMap(targetOrderSnapshot.docs.first.id, targetOrderSnapshot.docs.first.data() as Map<String, dynamic>);
         
@@ -410,8 +429,7 @@ class OrderProvider with ChangeNotifier {
           'lastModifiedAt': FieldValue.serverTimestamp(),
         });
       } else {
-        // Target table has no active order, create a new one
-        DocumentReference newOrderRef = FirebaseFirestore.instance.collection('orders').doc(); // Auto-generated ID
+        DocumentReference newOrderRef = FirebaseFirestore.instance.collection('orders').doc();
         
         final newOrderData = {
           'tableId': targetTableId,
@@ -427,12 +445,11 @@ class OrderProvider with ChangeNotifier {
         batch.set(newOrderRef, newOrderData);
       }
 
-      // Commit all operations in a single batch
       await batch.commit();
 
       _message = "Ürünler başarıyla masaya taşındı!";
-      onSuccess(); // UI'da pop() gibi işlemleri tetikleyebilir
-      clearOrder(); // Transfer sonrası OrderProvider'ın state'ini temizle
+      onSuccess();
+      clearOrder();
 
     } catch (e) {
       _message = "Masa taşıma işlemi sırasında hata oluştu: $e";
@@ -440,11 +457,10 @@ class OrderProvider with ChangeNotifier {
       print("Masa taşıma hatası: $e");
     } finally {
       _isLoading = false;
-      _safeNotifyListeners(); // İşlem bittiğini ve mesajı göstermek için notify
+      _safeNotifyListeners();
     }
   }
 
-  // OrderProvider durumunu temizler (örneğin ekran kapatıldığında)
   void clearOrder({bool shouldNotify = true}) {
     _selectedItems.clear();
     _selectedItemsForPayment.clear();

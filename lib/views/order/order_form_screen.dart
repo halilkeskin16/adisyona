@@ -704,8 +704,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                             );
                             return;
                           }
-                          _showPaymentDialog(selectedItems, colorScheme, textTheme, orderProvider);
-                        },
+                          _showPaymentDialog(selectedItems, colorScheme, textTheme, orderProvider);                        },
                   icon: const Icon(Icons.payment, color: Colors.white),
                   label: Text(
                     "Hesap Al",
@@ -716,7 +715,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Hesap al butonu için farklı renk
+                    backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -812,9 +811,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           ),
         );
         if (orderProvider.totalRemainingAmount <= 0.0) {
-          WidgetsBinding.instance.addPostFrameCallback((_) { // Pop işlemini erteleyelim
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
-              Navigator.pop(context); // Sipariş ekranını kapat
+              Navigator.pop(context);
             }
           });
         }

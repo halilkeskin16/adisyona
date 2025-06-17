@@ -2,6 +2,7 @@ import 'package:adisyona/views/dashboard/admin_dashboard.dart';
 import 'package:adisyona/views/kitchen/kitchen_screen.dart';
 import 'package:adisyona/views/order/order_table_selection_screen.dart';
 import 'package:adisyona/views/personel/personel_managment_screen.dart';
+import 'package:adisyona/views/reports/reports_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart'; // Mevcut AuthProvider'ınızın yolu
@@ -138,13 +139,13 @@ class _AdminDashboardMenuState extends State<AdminDashboardMenu> {
         title: 'Raporlar',
         icon: Icons.bar_chart,
         onTap: () {
-          // İstatistik ve Raporlama ekranına yönlendirme
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Raporlama Ekranı Yakında!')
-            ),
+          // Raporlama ekranına yönlendirme
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ReportsScreen()), // Raporlama ekranı için uygun widget'ı kullanın
           );
         },
-        requiredRole: 'admin', // Sadece adminler görebilir
+        requiredRole: 'admin',
       ),
     ];
 

@@ -71,11 +71,11 @@ class _ProductManagementViewState extends State<ProductManagementView> {
 
       setState(() {
         _categories = categorySnapshot.docs
-            .map((doc) => Category.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+            .map((doc) => Category.fromMap(doc.id, doc.data()))
             .toList();
 
         _products = productSnapshot.docs
-            .map((doc) => Product.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+            .map((doc) => Product.fromMap(doc.id, doc.data()))
             .toList();
 
         // Eğer daha önce seçili bir kategori ID'si varsa ve bu kategori silindiyse null yap
@@ -218,7 +218,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: colorScheme.background,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -231,7 +231,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
                 "Yeni Kategori Ekle",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -260,7 +260,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
                 "Yeni Ürün Ekle",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -306,7 +306,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
                 "Tüm Ürünler",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -340,7 +340,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(
@@ -411,7 +411,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

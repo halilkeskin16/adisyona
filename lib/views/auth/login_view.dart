@@ -2,7 +2,7 @@ import 'package:adisyona/views/dashboard/admin_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart'; // Mevcut AuthProvider'ınızın yolu
-import '../dashboard/admin_dashboard.dart'; // AdminDashboard'ınızın yolu
+// AdminDashboard'ınızın yolu
 import '../super_admin/super_admin_dashboard.dart'; // SuperAdminDashboard'ınızın yolu
 import 'subscription_expired_screen.dart'; // Abonelik bitiş ekranınızın yolu
 
@@ -186,7 +186,7 @@ class _LoginViewState extends State<LoginView> {
           borderSide: BorderSide.none, // Kenarlık çizgisini kaldır
         ),
         filled: true, // Alanın arka planını doldur
-        fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5), // Daha yumuşak arka plan rengi
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5), // Daha yumuşak arka plan rengi
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(

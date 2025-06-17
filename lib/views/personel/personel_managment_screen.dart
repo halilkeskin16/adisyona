@@ -63,7 +63,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
 
       setState(() {
         _staffList = snapshot.docs
-            .map((doc) => AppUser.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+            .map((doc) => AppUser.fromMap(doc.id, doc.data()))
             .toList();
       });
     } catch (e) {
@@ -85,7 +85,6 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
       _resultMessage = null; // Önceki mesajı temizle
     });
 
-    final name = _staffNameController.text.trim();
     final phone = _staffPhoneController.text.trim();
     final password = _staffPasswordController.text.trim();
 
@@ -161,7 +160,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: colorScheme.background,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -173,7 +172,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 "Yeni Personel Ekle",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 24),
@@ -242,7 +241,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                 "Kayıtlı Personel",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -267,7 +266,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                               margin: const EdgeInsets.only(bottom: 10),
                               elevation: 2,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              color: colorScheme.surfaceVariant,
+                              color: colorScheme.surfaceContainerHighest,
                               child: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: Row(
@@ -335,7 +334,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

@@ -36,25 +36,24 @@ class _KitchenScreenState extends State<KitchenScreen> {
     }
   }
 
-  // Siparişin ana durumunu güncelleme (örn: completed)
-  Future<void> _updateOrderStatus(String orderId, String newStatus) async {
+  // Siparişin mutfakta tamamlandığını işaretler (ana durumu 'pending' olarak bırakır)
+  Future<void> _markOrderKitchenCompleted(String orderId) async {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-        'status': 'ready',
-        'kitchenCompletedAt': FieldValue.serverTimestamp(),
+        'kitchenCompletedAt': FieldValue.serverTimestamp(), // Mutfak tamamlanma zamanı
+        'isReadyForService': true, // Mutfakta servise hazır işaretle
       });
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Sipariş hazırlandı ve masaya gönderildi!'),
-          backgroundColor: Colors.green,
+          content: Text('Sipariş mutfakta hazırlandı ve servise verildi!'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     } catch (e) {
-      print("Sipariş durumu güncellenirken hata oluştu: $e");
+      print("Mutfak durumu güncellenirken hata oluştu: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Hata: Sipariş durumu güncellenemedi."),
+          content: Text("Hata: Mutfak durumu güncellenemedi."),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -73,41 +72,27 @@ class _KitchenScreenState extends State<KitchenScreen> {
           .toList();
 
       final itemIndex = currentItems.indexWhere((item) =>
-          item.productId == itemToUpdate.productId && item.quantity == itemToUpdate.quantity && item.name == itemToUpdate.name);
+          item.uniqueId == itemToUpdate.uniqueId); // uniqueId üzerinden bul
 
       if (itemIndex != -1) {
+        // OrderItem'ın status alanının final olmaması gerekiyor
         currentItems[itemIndex] = OrderItem(
+          uniqueId: currentItems[itemIndex].uniqueId,
           productId: currentItems[itemIndex].productId,
           name: currentItems[itemIndex].name,
           price: currentItems[itemIndex].price,
           quantity: currentItems[itemIndex].quantity,
           status: newStatus,
-        );
-
-        // Tüm ürünler hazır olduğunda siparişin durumunu 'ready' olarak güncelle
-        final allItemsReady = currentItems.every((item) => item.status == 'ready');
-        if (allItemsReady) {
-          await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-            'items': currentItems.map((e) => e.toMap()).toList(),
-            'status': 'ready',
-            'kitchenCompletedAt': FieldValue.serverTimestamp(),
-          });
-        } else {
-          await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-            'items': currentItems.map((e) => e.toMap()).toList(),
-          });
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${itemToUpdate.name} hazırlandı!'),
-            backgroundColor: Colors.green,
-          ),
+          note: currentItems[itemIndex].note, // Notu koru
         );
       } else {
         print("Hata: Güncellenecek ürün sipariş listesinde bulunamadı.");
         return;
       }
+
+      await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
+        'items': currentItems.map((e) => e.toMap()).toList(),
+      });
     } catch (e) {
       print("Sipariş öğesi durumu güncellenirken hata oluştu: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -156,7 +141,8 @@ class _KitchenScreenState extends State<KitchenScreen> {
           stream: FirebaseFirestore.instance
               .collection('orders')
               .where('companyId', isEqualTo: _companyId)
-              .where('status', whereIn: ['pending', 'preparing']) // Sadece hazırlanmayı bekleyen siparişleri göster
+              .where('status', isEqualTo: 'pending') // Ana durumu 'pending' olmalı
+              .where('isReadyForService', isEqualTo: false) // Sadece mutfakta henüz hazır olmayanları göster
               .orderBy('createdAt', descending: false)
               .snapshots(),
           builder: (context, snapshot) {
@@ -195,7 +181,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
                 final order = orders[index];
 
                 final allItemsReady = order.items.every((item) => item.status == 'ready');
-                // isOrderPending ve isOrderPreparing kaldırıldı çünkü artık tek bir 'pending' durumu var.
+
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 16),
@@ -210,13 +196,19 @@ class _KitchenScreenState extends State<KitchenScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "🪑 Masa: ${order.tableName}",
-                              style: textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.primary,
+                            // Masa isminin taşmasını engellemek için Expanded kullanıldı
+                            Expanded(
+                              child: Text(
+                                "🪑 Masa: ${order.tableName}",
+                                style: textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.primary,
+                                ),
+                                overflow: TextOverflow.ellipsis, // Metin taşarsa üç nokta göster
+                                maxLines: 1, // Tek satırda kalmasını sağla
                               ),
                             ),
+                            const SizedBox(width: 8), // Masa adı ile zaman arasında boşluk
                             Text(
                               "⏱️ ${timeago.format(order.createdAt?.toDate() ?? DateTime.now(), locale: 'tr')}",
                               style: textTheme.bodySmall?.copyWith(
@@ -228,41 +220,53 @@ class _KitchenScreenState extends State<KitchenScreen> {
                         ),
                         const Divider(height: 24, thickness: 1),
                         // Sipariş öğeleri
-                        ...order.items.where((item) => item.status != 'ready').map((item) { // Sadece hazır olmayanları göster
-                          final isItemReady = item.status == 'ready'; // Bu kontrol burada mantıksızlaşıyor çünkü zaten hazır olmayanları filtreledik.
-                                                                    // Ancak kod tutarlılığı için bırakılabilir veya kaldırılabilir.
+                        ...order.items.where((item) => item.status != 'ready').map((item) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Row(
+                            child: Column( // Ürün ve notu için Column
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  // Artık sadece hazır olmayanları gösterdiğimiz için hep radio_button_unchecked olacak
-                                  Icons.radio_button_unchecked,
-                                  color: colorScheme.primary.withOpacity(0.7),
-                                  size: 22,
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.radio_button_unchecked,
+                                      color: colorScheme.primary.withOpacity(0.7),
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "${item.name} x${item.quantity}",
+                                        style: textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.done,
+                                        color: Colors.green,
+                                      ),
+                                      onPressed: () => _updateOrderItemStatus(
+                                        order.id,
+                                        item,
+                                        'ready',
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    "${item.name} x${item.quantity}",
-                                    style: textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: colorScheme.onSurface,
-                                      // decoration kaldırıldı çünkü hazır olmayanları gösteriyoruz
+                                if (item.note != null && item.note!.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 34.0, top: 4.0), // İkon ve metinle hizala
+                                    child: Text(
+                                      "Not: ${item.note}",
+                                      style: textTheme.bodySmall?.copyWith(
+                                        fontStyle: FontStyle.italic,
+                                        color: colorScheme.onSurface.withOpacity(0.6),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: const Icon( // Sadece 'onayla' butonu olacak
-                                    Icons.done,
-                                    color: Colors.green,
-                                  ),
-                                  onPressed: () => _updateOrderItemStatus(
-                                    order.id,
-                                    item,
-                                    'ready', // Direkt 'ready' durumuna geçiş
-                                  ),
-                                ),
                               ],
                             ),
                           );
@@ -282,16 +286,16 @@ class _KitchenScreenState extends State<KitchenScreen> {
                             ),
                           ),
                         const SizedBox(height: 16),
-                        // Siparişi Tamamla butonu
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: allItemsReady // Tüm öğeler hazırsa butonu etkinleştir
-                                ? () => _updateOrderStatus(order.id, 'completed')
-                                : null, // Değilse devre dışı bırak
+                            // Mutfak onayını _markOrderKitchenCompleted ile yapıyoruz
+                            onPressed: allItemsReady
+                                ? () => _markOrderKitchenCompleted(order.id)
+                                : null,
                             icon: const Icon(Icons.check_circle_outline, color: Colors.white),
                             label: Text(
-                              allItemsReady ? "Siparişi Tamamla" : "Tüm Ürünler Hazır Değil",
+                              allItemsReady ? "Siparişi Mutfakta Tamamla" : "Tüm Ürünler Hazır Değil",
                               style: textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                             style: ElevatedButton.styleFrom(

@@ -161,7 +161,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       body: Container(
         // Arka plan rengini ve kenar yuvarlaklığını ayarla
         decoration: BoxDecoration(
-          color: colorScheme.background,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -174,7 +174,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                 "Yeni Firma Ekle",
                 style: textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 24),
@@ -226,7 +226,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                 "Kayıtlı Firmalar",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),

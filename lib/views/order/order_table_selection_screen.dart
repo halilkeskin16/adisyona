@@ -70,8 +70,8 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
       }
 
       setState(() {
-        _areas = areaSnap.docs.map((doc) => Area.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList();
-        _tables = tableSnap.docs.map((doc) => TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>)).toList();
+        _areas = areaSnap.docs.map((doc) => Area.fromMap(doc.id, doc.data())).toList();
+        _tables = tableSnap.docs.map((doc) => TableModel.fromMap(doc.id, doc.data())).toList();
         _tableOrders = tableOrders;
       });
     } catch (e) {

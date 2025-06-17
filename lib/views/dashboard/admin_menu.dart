@@ -175,7 +175,7 @@ class _AdminDashboardMenuState extends State<AdminDashboardMenu> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: color.background,
+          color: color.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.all(24), // Daha fazla padding

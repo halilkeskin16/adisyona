@@ -65,11 +65,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
       setState(() {
         _areas = areaSnapshot.docs
-            .map((doc) => Area.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+            .map((doc) => Area.fromMap(doc.id, doc.data()))
             .toList();
 
         _tables = tableSnapshot.docs
-            .map((doc) => TableModel.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+            .map((doc) => TableModel.fromMap(doc.id, doc.data()))
             .toList();
 
         // Eğer daha önce seçili bir bölge ID'si varsa ve bu bölge silindiyse null yap
@@ -205,7 +205,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: colorScheme.background, // Temanın arka plan rengini kullan
+          color: colorScheme.surface, // Temanın arka plan rengini kullan
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -218,7 +218,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 "Yeni Bölge Ekle",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -247,7 +247,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 "Yeni Masa Ekle",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -285,7 +285,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 "Tanımlı Bölgeler ve Masalar",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -316,7 +316,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(
@@ -386,7 +386,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

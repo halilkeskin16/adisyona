@@ -1,5 +1,6 @@
-// lib/models/order_model.dart dosyanız
+// lib/models/order_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 
 class OrderModel {
   final String id;
@@ -13,6 +14,8 @@ class OrderModel {
   final String? paymentMethod;
   final Timestamp? paymentDate;
   final Timestamp? kitchenCompletedAt;
+  final String? staffId;
+  final bool? isReadyForService; // <<< YENİ EKLENDİ: Mutfakta servise hazır mı?
 
   OrderModel({
     required this.id,
@@ -26,24 +29,28 @@ class OrderModel {
     this.paymentMethod,
     this.paymentDate,
     this.kitchenCompletedAt,
+    this.staffId,
+    this.isReadyForService, // <<< CONSTRUCTOR'A EKLENDİ
   });
 
   factory OrderModel.fromMap(String id, Map<String, dynamic> map) {
     return OrderModel(
       id: id,
-      tableId: map['tableId'] ?? '',
-      tableName: map['tableName'] ?? '',
+      tableId: map['tableId'] as String? ?? '',
+      tableName: map['tableName'] as String? ?? '',
       items: (map['items'] as List<dynamic>?)
               ?.map((item) => OrderItem.fromMap(item as Map<String, dynamic>))
               .toList() ??
           [],
-      companyId: map['companyId'] ?? '',
+      companyId: map['companyId'] as String? ?? '',
       createdAt: map['createdAt'] as Timestamp?,
-      status: map['status'] ?? 'pending',
+      status: map['status'] as String? ?? 'pending',
       totalAmount: (map['totalAmount'] as num?)?.toDouble() ?? 0.0,
       paymentMethod: map['paymentMethod'] as String?,
       paymentDate: map['paymentDate'] as Timestamp?,
       kitchenCompletedAt: map['kitchenCompletedAt'] as Timestamp?,
+      staffId: map['staffId'] as String?,
+      isReadyForService: map['isReadyForService'] as bool?, // <<< fromMap'TEN OKUNDU
     );
   }
 
@@ -59,42 +66,52 @@ class OrderModel {
       'paymentMethod': paymentMethod,
       'paymentDate': paymentDate,
       'kitchenCompletedAt': kitchenCompletedAt,
+      'staffId': staffId,
+      'isReadyForService': isReadyForService, // <<< toMap'E EKLENDİ
     };
   }
 }
 
 class OrderItem {
+  final String uniqueId;
   final String productId;
   final String name;
   final double price;
-  final int quantity;
-  final String status;
+  int quantity;
+  String? status;
+  String? note;
 
   OrderItem({
+    String? uniqueId,
     required this.productId,
     required this.name,
     required this.price,
-    required this.quantity,
-    required this.status,
-  });
+    this.quantity = 1,
+    this.status,
+    this.note,
+  }) : this.uniqueId = uniqueId ?? const Uuid().v4();
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
-      productId: map['productId'] ?? '',
-      name: map['name'] ?? '',
+      uniqueId: map['uniqueId'] as String? ?? const Uuid().v4(),
+      productId: map['productId'] as String? ?? '',
+      name: map['name'] as String? ?? '',
       price: (map['price'] as num?)?.toDouble() ?? 0.0,
-      quantity: map['quantity'] ?? 0,
-      status: map['status'] ?? 'pending',
+      quantity: (map['quantity'] as num?)?.toInt() ?? 0,
+      status: map['status'] as String? ?? 'pending',
+      note: map['note'] as String?,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'uniqueId': uniqueId,
       'productId': productId,
       'name': name,
       'price': price,
       'quantity': quantity,
       'status': status,
+      'note': note,
     };
   }
 }

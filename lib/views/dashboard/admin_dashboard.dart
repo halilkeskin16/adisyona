@@ -85,7 +85,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       setState(() {
         _resultMessage = "Hata: Bölgeler ve masalar yüklenirken sorun oluştu: $e";
       });
-      print("Error loading areas and tables: $e");
     }
   }
 
@@ -277,7 +276,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               if (_resultMessage != null) _buildResultMessage(colorScheme),
               const SizedBox(height: 24),
 
-              Divider(color: colorScheme.onSurface.withOpacity(0.2)),
+              Divider(color: colorScheme.onSurface.withValues(alpha: 0.2), thickness: 1),
               const SizedBox(height: 20),
 
               // Tanımlı Bölgeler ve Masalar Bölümü
@@ -310,25 +309,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        prefixIcon: icon != null ? Icon(icon, color: Theme.of(context).colorScheme.primary.withOpacity(0.7)) : null,
+        prefixIcon: icon != null ? Icon(icon, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
         ),
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -380,23 +379,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
       onChanged: (val) => setState(() => _selectedAreaId = val),
       decoration: InputDecoration(
         labelText: "Bölge Seç",
-        prefixIcon: Icon(Icons.category_outlined, color: colorScheme.primary.withOpacity(0.7)),
+        prefixIcon: Icon(Icons.category_outlined, color: colorScheme.primary.withValues(alpha: 0.7)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
-        labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+        labelStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.7)),
       ),
       style: TextStyle(color: colorScheme.onSurface, fontSize: 16),
       dropdownColor: colorScheme.surface, // Dropdown menü arka plan rengi
@@ -409,7 +408,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isError ? colorScheme.error.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+        color: isError ? colorScheme.error.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isError ? colorScheme.error : Colors.green,
@@ -446,7 +445,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           child: Text(
             "Henüz tanımlı bölge bulunmamaktadır. Lütfen yukarıdan yeni bir bölge ekleyin.",
             textAlign: TextAlign.center,
-            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
           ),
         ),
       );
@@ -480,7 +479,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             subtitle: Text(
               "${areaTables.length} Masa",
               style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.6),
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             children: areaTables.isEmpty
@@ -489,7 +488,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
                       child: Text(
                         "Bu bölgeye henüz masa tanımlanmamıştır.",
-                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.5)),
+                        style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
                       ),
                     )
                   ]

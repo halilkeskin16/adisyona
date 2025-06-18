@@ -104,7 +104,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: color.background,
+          color: color.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.all(24),
@@ -117,7 +117,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 "Dönem Seçimi",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: color.onBackground,
+                  color: color.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -147,7 +147,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               if (reportsProvider.isLoading)
                 Center(child: CircularProgressIndicator(color: color.primary))
               else if (reportsProvider.message != null && reportsProvider.message!.isNotEmpty)
-                Center(child: Text(reportsProvider.message!, style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7))))
+                Center(child: Text(reportsProvider.message!, style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7))))
               else
                 const SizedBox.shrink(),
               const SizedBox(height: 16),
@@ -161,16 +161,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 "Rapor Türü",
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: color.onBackground,
+                  color: color.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
               _buildReportTypeDropdown(color, textTheme, reportsProvider),
               const SizedBox(height: 24),
-
-              // Filtrelenmiş rapor türüne göre listeyi göster
-              // Expanded widget'ı kaldırıldı, çünkü ana Column zaten SingleChildScrollView içinde.
-              // ListView.builder'lar shrinkWrap: true ve NeverScrollableScrollPhysics() ile kendi içeriklerine göre boyutlanacak.
               _buildReportContent(color, textTheme, reportsProvider),
             ],
           ),
@@ -179,16 +175,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  // Yeni: Tarih Filtreleme Dropdown'ı
   Widget _buildDateFilterDropdown(ColorScheme color, TextTheme textTheme, ReportsProvider reportsProvider) {
     return DropdownButtonFormField<String>(
       value: reportsProvider.selectedDateFilter,
       decoration: InputDecoration(
         labelText: "Dönem Seçin",
-        labelStyle: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7)),
+        labelStyle: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7)),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: color.surfaceVariant.withOpacity(0.5),
+        fillColor: color.surfaceContainerHighest.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // İç padding
       ),
       items: const [
@@ -225,10 +220,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
       value: _selectedReportType,
       decoration: InputDecoration(
         labelText: "Rapor Türü Seçin",
-        labelStyle: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7)),
+        labelStyle: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7)),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: color.surfaceVariant.withOpacity(0.5),
+        fillColor: color.surfaceContainerHighest.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // İç padding
       ),
       items: const [
@@ -254,7 +249,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Widget _buildTotalSalesCard(ColorScheme color, TextTheme textTheme, ReportsProvider reportsProvider) {
     return Card(
       elevation: 6,
-      shadowColor: color.primary.withOpacity(0.4),
+      shadowColor: color.primary.withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: color.surface,
       child: Padding(
@@ -269,7 +264,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 Text(
                   "Toplam Satış",
                   style: textTheme.titleMedium?.copyWith(
-                    color: color.onSurface.withOpacity(0.7),
+                    color: color.onSurface.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -285,7 +280,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 Text(
                   _getDateRangeText(reportsProvider),
                   style: textTheme.bodySmall?.copyWith(
-                    color: color.onSurface.withOpacity(0.5),
+                    color: color.onSurface.withValues(alpha: 0.6),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -305,24 +300,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
     // Eğer mesaj var ve rapor tiplerinin listesi boşsa mesajı göster
     if (reportsProvider.message != null && reportsProvider.message!.isNotEmpty &&
         reportsProvider.staffSales.isEmpty && reportsProvider.tableSales.isEmpty && reportsProvider.productSalesAmount.isEmpty) {
-      return Center(child: Text(reportsProvider.message!, style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7))));
+      return Center(child: Text(reportsProvider.message!, style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7))));
     }
 
-    // 'total' seçeneği kaldırıldığı için, varsayılan olarak 'staff' veya boş bir SizedBox.shrink() döndürülebilir
-    // Eğer reportsProvider.totalSales hala gösteriliyorsa, 'total' case'i kaldırılabilir.
-    // Şimdilik 'total' case'i kaldırılıyor ve direkt 'staff' ya da boş dönüyoruz.
-    // if (_selectedReportType == 'total') {
-    //   return Center(
-    //     child: Text(
-    //       "Genel toplam yukarıdaki kartta gösterilmektedir.",
-    //       style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7)),
-    //     ),
-    //   );
-    // } 
-    
     if (_selectedReportType == 'staff') {
       if (reportsProvider.staffSales.isEmpty) {
-        return Center(child: Text("Personel satış verisi bulunamadı.", style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7))));
+        return Center(child: Text("Personel satış verisi bulunamadı.", style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7))));
       }
       return ListView.builder(
         shrinkWrap: true,
@@ -335,7 +318,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           return Card(
             margin: const EdgeInsets.only(bottom: 8),
             elevation: 2,
-            color: color.surfaceVariant,
+            color: color.surfaceContainerHighest,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: Icon(Icons.person, color: color.primary),
@@ -347,7 +330,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       );
     } else if (_selectedReportType == 'table') {
       if (reportsProvider.tableSales.isEmpty) {
-        return Center(child: Text("Masa satış verisi bulunamadı.", style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7))));
+        return Center(child: Text("Masa satış verisi bulunamadı.", style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7))));
       }
       return ListView.builder(
         shrinkWrap: true,
@@ -359,7 +342,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           return Card(
             margin: const EdgeInsets.only(bottom: 8),
             elevation: 2,
-            color: color.surfaceVariant,
+            color: color.surfaceContainerHighest,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: Icon(Icons.table_bar, color: color.primary),
@@ -371,7 +354,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       );
     } else if (_selectedReportType == 'product') {
       if (reportsProvider.productSalesAmount.isEmpty) {
-        return Center(child: Text("Ürün satış verisi bulunamadı.", style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.7))));
+        return Center(child: Text("Ürün satış verisi bulunamadı.", style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(alpha: 0.7))));
       }
       return ListView.builder(
         shrinkWrap: true,
@@ -385,12 +368,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
           return Card(
             margin: const EdgeInsets.only(bottom: 8),
             elevation: 2,
-            color: color.surfaceVariant,
+            color: color.surfaceContainerHighest,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
               leading: Icon(Icons.fastfood, color: color.primary),
               title: Text(productName, style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-              subtitle: Text("${quantity} adet", style: textTheme.bodySmall?.copyWith(color: color.onSurface.withOpacity(0.7))),
+              subtitle: Text("$quantity adet", style: textTheme.bodySmall?.copyWith(color: color.onSurface.withValues(alpha: 0.7))),
               trailing: Text("${amount.toStringAsFixed(2)} ₺", style: textTheme.titleMedium?.copyWith(color: color.secondary, fontWeight: FontWeight.bold)),
             ),
           );

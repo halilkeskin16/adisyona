@@ -107,8 +107,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: "# ARAMA YAP / BARKOD OKUT #",
-                    hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
-                    prefixIcon: Icon(Icons.search, color: colorScheme.onSurface.withOpacity(0.6)),
+                    hintStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.6)),
+                    prefixIcon: Icon(Icons.search, color: colorScheme.onSurface.withValues(alpha: 0.6)),
                     filled: true,
                     fillColor: colorScheme.surfaceContainerHighest,
                     border: OutlineInputBorder(
@@ -172,7 +172,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 productProvider.categories.isEmpty
                                     ? "Kategori bulunamadı. Lütfen önce kategori ekleyin."
                                     : "Bu kategoriye ait ürün bulunmamaktadır.",
-                                style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+                                style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -196,7 +196,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       return Center(
         child: Text(
           productProvider.isLoading ? "Kategoriler yükleniyor..." : "Henüz kategori tanımlanmamıştır.",
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
       );
     }
@@ -223,11 +223,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: isSelected ? colorScheme.primary : colorScheme.outline.withOpacity(0.3),
+                color: isSelected ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.3),
                 width: isSelected ? 2.0 : 1,
               ),
             ),
-            color: isSelected ? colorScheme.primary.withOpacity(0.15) : colorScheme.surfaceContainerHighest,
+            color: isSelected ? colorScheme.primary.withValues(alpha: 0.1) : colorScheme.surfaceContainerHighest,
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -255,7 +255,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       return Center(
         child: Text(
           "Seçili kategori veya arama kriterlerine göre ürün bulunmamaktadır.",
-          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
           textAlign: TextAlign.center,
         ),
       );
@@ -284,11 +284,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                  color: isProductSelected ? colorScheme.primary : colorScheme.outline.withOpacity(0.3),
+                  color: isProductSelected ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.3),
                   width: isProductSelected ? 2.0 : 1,
                 ),
               ),
-              color: isProductSelected ? colorScheme.primary.withOpacity(0.1) : colorScheme.surface,
+              color: isProductSelected ? colorScheme.primary.withValues(alpha: 0.1) : colorScheme.surface,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
@@ -300,7 +300,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                         color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(Icons.fastfood, color: colorScheme.onSurface.withOpacity(0.6)),
+                      child: Icon(Icons.fastfood, color: colorScheme.onSurface.withValues(alpha: 0.7), size: 30),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -320,7 +320,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                           Text(
                             product.description.isNotEmpty ? product.description : "Açıklama yok",
                             style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurface.withOpacity(0.7),
+                              color: colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 11,
                             ),
                             maxLines: 1,
@@ -364,7 +364,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           margin: const EdgeInsets.only(bottom: 8),
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          color: isItemCompleted ? colorScheme.surfaceContainerHighest.withOpacity(0.7) : colorScheme.surfaceContainerHighest,
+          color: isItemCompleted ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.1) : colorScheme.surfaceContainerHighest,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Column(
@@ -394,7 +394,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                           Text(
                             "${item.price.toStringAsFixed(2)} ₺",
                             style: textTheme.bodyMedium?.copyWith(
-                              color: isItemCompleted ? Colors.grey.shade500 : colorScheme.onSurface.withOpacity(0.7),
+                              color: isItemCompleted ? Colors.grey.shade500 : colorScheme.onSurface.withValues(alpha: 0.8),
                               fontSize: 11,
                             ),
                           ),
@@ -454,7 +454,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                         "Not: ${item.note}",
                         style: textTheme.bodySmall?.copyWith(
                           fontStyle: FontStyle.italic,
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -483,7 +483,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               labelText: 'Notunuzu buraya yazın',
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               filled: true,
-              fillColor: colorScheme.surfaceVariant.withOpacity(0.5),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
             ),
             maxLines: 3,
             minLines: 1,
@@ -499,8 +499,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 orderProvider.updateItemNote(item, noteController.text.trim());
                 Navigator.pop(context);
               },
-              child: Text('Kaydet', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
               style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),
+              child: Text('Kaydet', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
             ),
           ],
         );
@@ -516,7 +516,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -534,7 +534,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   Text(
                     "Toplam",
                     style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -554,7 +554,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   Text(
                     "Ödenen",
                     style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -574,7 +574,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   Text(
                     "Kalan",
                     style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -605,7 +605,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                       "Seçili Ürünler",
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: colorScheme.onBackground,
+                        color: colorScheme.onSurface,
                         fontSize: 16,
                       ),
                     ),
@@ -774,24 +774,24 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 Navigator.pop(context);
                 _processPayment('Nakit', selectedItems, orderProvider);
               },
-              child: Text('Nakit', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+              child: Text('Nakit', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
                 _processPayment('Kart', selectedItems, orderProvider);
               },
-              child: Text('Kart', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              child: Text('Kart', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
                 _processPayment('Yemek Kartı', selectedItems, orderProvider);
               },
-              child: Text('Yemek Kartı', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+              child: Text('Yemek Kartı', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
             ),
           ],
         );
@@ -806,7 +806,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Ödeme başarıyla tamamlandı (${paymentMethod})'),
+            content: Text('Ödeme başarıyla tamamlandı ($paymentMethod)'),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
@@ -878,7 +878,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               },
             ),
             ElevatedButton(
-              child: Text('İleri', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
               style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),
               onPressed: () {
                 if (orderProvider.selectedItemsForTransfer.isEmpty) {
@@ -890,6 +889,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 Navigator.of(dialogContext).pop();
                 _showTargetTableSelectionDialog(context, orderProvider, user);
               },
+              child: Text('İleri', style: textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary)),
             ),
           ],
         );

@@ -99,7 +99,6 @@ class ReportsProvider with ChangeNotifier {
       _staffNames = names;
       _safeNotifyListeners(); // İsimler çekildiğinde UI'ı güncelle
     } catch (e) {
-      print("Kullanıcı isimleri çekilirken hata oluştu: $e");
       _message = "Personel isimleri yüklenirken hata oluştu.";
       _safeNotifyListeners();
     }
@@ -120,7 +119,6 @@ class ReportsProvider with ChangeNotifier {
       _productNames = names;
       _safeNotifyListeners(); // Ürün isimleri çekildiğinde UI'ı güncelle
     } catch (e) {
-      print("Ürün isimleri çekilirken hata oluştu: $e");
       _message = "Ürün isimleri yüklenirken hata oluştu.";
       _safeNotifyListeners();
     }
@@ -157,8 +155,8 @@ class ReportsProvider with ChangeNotifier {
       }
 
       for (var doc in querySnapshot.docs) {
-        final order = OrderModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-        double orderTotal = order.items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+        final order = OrderModel.fromMap(doc.id, doc.data());
+        double orderTotal = order.items.fold(0.0, (sum1, item) => sum1 + (item.price * item.quantity));
 
         _totalSales += orderTotal;
 
@@ -178,7 +176,6 @@ class ReportsProvider with ChangeNotifier {
       _message = null; // Başarılı olursa mesajı temizle
     } catch (e) {
       _message = "Raporlar çekilirken hata oluştu: $e";
-      print("Rapor çekme hatası: $e");
     } finally {
       _isLoading = false;
       _safeNotifyListeners(); // Yükleme bittiğini ve mesajı göstermek için notify

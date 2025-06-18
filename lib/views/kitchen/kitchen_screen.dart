@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,27 +32,24 @@ class _KitchenScreenState extends State<KitchenScreen> {
       setState(() {
         _companyId = user.companyId;
       });
-    } else {
-      print("Mutfak Ekranı: Kullanıcı veya şirket ID'si bulunamadı.");
-      // Kullanıcıya bilgi verebilir veya giriş ekranına yönlendirebilirsiniz
     }
   }
 
-  // Siparişin mutfakta tamamlandığını işaretler (ana durumu 'pending' olarak bırakır)
   Future<void> _markOrderKitchenCompleted(String orderId) async {
     try {
       await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-        'kitchenCompletedAt': FieldValue.serverTimestamp(), // Mutfak tamamlanma zamanı
-        'isReadyForService': true, // Mutfakta servise hazır işaretle
+        'kitchenCompletedAt': FieldValue.serverTimestamp(), 
+        'isReadyForService': true, 
       });
+      // ignore: 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Sipariş mutfakta hazırlandı ve servise verildi!'),
+          // ignore: 
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     } catch (e) {
-      print("Mutfak durumu güncellenirken hata oluştu: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Hata: Mutfak durumu güncellenemedi."),
@@ -86,7 +85,6 @@ class _KitchenScreenState extends State<KitchenScreen> {
           note: currentItems[itemIndex].note, // Notu koru
         );
       } else {
-        print("Hata: Güncellenecek ürün sipariş listesinde bulunamadı.");
         return;
       }
 
@@ -94,7 +92,6 @@ class _KitchenScreenState extends State<KitchenScreen> {
         'items': currentItems.map((e) => e.toMap()).toList(),
       });
     } catch (e) {
-      print("Sipariş öğesi durumu güncellenirken hata oluştu: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Hata: Ürün durumu güncellenemedi."),
@@ -133,7 +130,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: colorScheme.background,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -165,7 +162,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
                 child: Text(
                   "Şu anda hazırlanmayı bekleyen sipariş yok. 🧑‍🍳",
                   textAlign: TextAlign.center,
-                  style: textTheme.headlineSmall?.copyWith(color: colorScheme.onBackground.withOpacity(0.7)),
+                  style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               );
             }
@@ -212,7 +209,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
                             Text(
                               "⏱️ ${timeago.format(order.createdAt?.toDate() ?? DateTime.now(), locale: 'tr')}",
                               style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurface.withOpacity(0.6),
+                                color: colorScheme.onSurface.withValues(alpha: 0.6),
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
@@ -230,7 +227,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
                                   children: [
                                     Icon(
                                       Icons.radio_button_unchecked,
-                                      color: colorScheme.primary.withOpacity(0.7),
+                                      color: colorScheme.primary.withValues(alpha: 0.8),
                                       size: 22,
                                     ),
                                     const SizedBox(width: 12),
@@ -263,14 +260,14 @@ class _KitchenScreenState extends State<KitchenScreen> {
                                       "Not: ${item.note}",
                                       style: textTheme.bodySmall?.copyWith(
                                         fontStyle: FontStyle.italic,
-                                        color: colorScheme.onSurface.withOpacity(0.6),
+                                        color: colorScheme.onSurface.withValues(alpha: 0.7),
                                       ),
                                     ),
                                   ),
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                         // Eğer hiç ürün kalmadıysa (hepsi hazırlandıysa), "Tüm Ürünler Hazır" mesajı gösterilebilir
                         if (order.items.every((item) => item.status == 'ready'))
                           Padding(
@@ -299,7 +296,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
                               style: textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: allItemsReady ? Colors.green : colorScheme.onSurface.withOpacity(0.3),
+                              backgroundColor: allItemsReady ? Colors.green : colorScheme.onSurface.withValues(alpha: 0.5),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 3,

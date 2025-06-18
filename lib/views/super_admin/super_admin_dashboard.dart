@@ -44,7 +44,6 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       });
     } catch (e) {
       // Hata durumunda kullanıcıya bilgi ver veya logla
-      print("Şirketler çekilirken hata oluştu: $e");
       setState(() {
         _result = "Şirketler yüklenirken hata oluştu.";
       });
@@ -218,7 +217,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
               const SizedBox(height: 40),
 
               // Ayrıcı çizgi
-              Divider(color: colorScheme.onSurface.withOpacity(0.2)),
+              Divider(color: colorScheme.onSurface.withValues(alpha: 0.2), thickness: 1),
               const SizedBox(height: 20),
 
               // "Kayıtlı Firmalar" başlığı
@@ -263,7 +262,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
         floatingLabelBehavior: FloatingLabelBehavior.auto, // Label davranışı
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), width: 1),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -308,7 +307,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isError ? colorScheme.error.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+        color: isError ? colorScheme.error.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isError ? colorScheme.error : Colors.green,
@@ -370,7 +369,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       return Center(
         child: Text(
           "Henüz kayıtlı firma bulunmamaktadır.",
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.6)),
         ),
       );
     }
@@ -397,7 +396,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1), // Hafif şeffaf arka plan
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.apartment, color: colorScheme.primary),
@@ -418,7 +417,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                       Text(
                         "Geçerlilik Tarihi: $dateFormatted",
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.7),
+                          color: colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],

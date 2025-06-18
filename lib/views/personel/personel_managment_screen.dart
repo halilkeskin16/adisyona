@@ -70,7 +70,6 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
       setState(() {
         _resultMessage = "Hata: Personel listesi yüklenirken sorun oluştu: $e";
       });
-      print("Personel yükleme hatası: $e");
     } finally {
       setState(() {
         _isLoading = false;
@@ -137,7 +136,6 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
       setState(() {
         _resultMessage = "Hata oluştu: ${e.toString()}";
       });
-      print("Personel ekleme hatası: $e");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -233,7 +231,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
               ),
               const SizedBox(height: 40),
 
-              Divider(color: colorScheme.onSurface.withOpacity(0.2)),
+              Divider(color: colorScheme.onSurface.withValues(alpha: 0.2), thickness: 1),
               const SizedBox(height: 20),
 
               // Kayıtlı Personel Listesi Başlığı
@@ -251,7 +249,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                   ? Center(
                       child: Text(
                         "Henüz kayıtlı personel bulunmamaktadır.",
-                        style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+                        style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
                       ),
                     )
                   : _isLoading && _staffList.isEmpty
@@ -287,7 +285,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                                           Text(
                                             "Rol: ${staff.role == 'garson' ? 'Garson' : staff.role}", // Rolü Türkçe göster
                                             style: textTheme.bodySmall?.copyWith(
-                                              color: colorScheme.onSurface.withOpacity(0.7),
+                                              color: colorScheme.onSurface.withValues(alpha: 0.7),
                                             ),
                                           ),
                                         ],
@@ -327,24 +325,24 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
-        prefixIcon: icon != null ? Icon(icon, color: colorScheme.primary.withOpacity(0.7)) : null,
+        labelStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
+        prefixIcon: icon != null ? Icon(icon, color: colorScheme.primary.withValues(alpha: 0.7)) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.1), // Daha açık bir arka plan rengi
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
-        hintStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.5)),
+        hintStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.5)),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -360,7 +358,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isError ? colorScheme.error.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+        color: isError ? colorScheme.error.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isError ? colorScheme.error : Colors.green,

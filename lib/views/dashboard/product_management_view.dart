@@ -91,7 +91,6 @@ class _ProductManagementViewState extends State<ProductManagementView> {
       setState(() {
         _resultMessage = "Hata: Kategori ve ürünler yüklenirken sorun oluştu: $e";
       });
-      print("Error loading categories and products: $e");
     }
   }
 
@@ -298,7 +297,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
               if (_resultMessage != null) _buildResultMessage(colorScheme),
               const SizedBox(height: 24),
 
-              Divider(color: colorScheme.onSurface.withOpacity(0.2)),
+              Divider(color: colorScheme.onSurface.withValues(alpha: 0.2), thickness: 1),
               const SizedBox(height: 20),
 
               // Tanımlı Kategoriler ve Ürünler Bölümü
@@ -334,25 +333,25 @@ class _ProductManagementViewState extends State<ProductManagementView> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        prefixIcon: icon != null ? Icon(icon, color: Theme.of(context).colorScheme.primary.withOpacity(0.7)) : null,
+        prefixIcon: icon != null ? Icon(icon, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
         ),
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -405,23 +404,23 @@ class _ProductManagementViewState extends State<ProductManagementView> {
       onChanged: (val) => setState(() => _selectedCategoryId = val),
       decoration: InputDecoration(
         labelText: "Kategori Seç",
-        prefixIcon: Icon(Icons.menu_book_outlined, color: colorScheme.primary.withOpacity(0.7)), // Kategori ikonu
+        prefixIcon: Icon(Icons.menu_book_outlined, color: colorScheme.primary.withValues(alpha: 0.7)), // Kategori ikonu
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
-        labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+        labelStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.7)),
       ),
       style: TextStyle(color: colorScheme.onSurface, fontSize: 16),
       dropdownColor: colorScheme.surface,
@@ -434,7 +433,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isError ? colorScheme.error.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+        color: isError ? colorScheme.error.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isError ? colorScheme.error : Colors.green,
@@ -471,7 +470,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
           child: Text(
             "Henüz tanımlı kategori veya ürün bulunmamaktadır. Lütfen yukarıdan yeni bir kategori ve ürün ekleyin.",
             textAlign: TextAlign.center,
-            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
           ),
         ),
       );
@@ -483,7 +482,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
           child: Text(
             "Seçili kategorilerde henüz ürün bulunmamaktadır. Lütfen yukarıdan yeni bir ürün ekleyin.",
             textAlign: TextAlign.center,
-            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withValues( alpha: 0.7)),
           ),
         ),
       );
@@ -545,7 +544,7 @@ class _ProductManagementViewState extends State<ProductManagementView> {
                   Text(
                     product.description,
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

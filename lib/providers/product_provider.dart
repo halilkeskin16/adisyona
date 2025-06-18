@@ -85,7 +85,6 @@ class ProductProvider with ChangeNotifier {
       _error = null; // Başarılıysa hata mesajını temizle
     } catch (e) {
       _error = 'Veri yüklenemedi: $e'; // Hata durumunda mesajı kaydet
-      print('ProductProvider fetchData error: $e');
     } finally {
       _isLoading = false;
       notifyListeners(); // Yükleme bittiğini bildir

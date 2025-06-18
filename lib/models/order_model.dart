@@ -89,7 +89,7 @@ class OrderItem {
     this.quantity = 1,
     this.status,
     this.note,
-  }) : this.uniqueId = uniqueId ?? const Uuid().v4();
+  }) : uniqueId = uniqueId ?? const Uuid().v4();
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(

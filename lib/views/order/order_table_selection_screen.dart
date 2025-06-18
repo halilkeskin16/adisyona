@@ -60,10 +60,10 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
         } else if (data['items'] != null) {
           // Eğer totalAmount yoksa items'dan hesapla
           final items = data['items'] as List;
-          totalAmount = items.fold(0.0, (sum, item) {
+          totalAmount = items.fold(0.0, (sum1, item) {
             final price = (item['price'] as num).toDouble();
             final quantity = (item['quantity'] as num).toInt();
-            return sum + (price * quantity);
+            return sum1 + (price * quantity);
           });
         }
         tableOrders[tableId] = (tableOrders[tableId] ?? 0) + totalAmount;

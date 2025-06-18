@@ -36,7 +36,7 @@ class _AdminDashboardMenuState extends State<AdminDashboardMenu> {
           ),
           content: Text(
             'Uygulamadan çıkış yapmak istediğinize emin misiniz?',
-            style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withOpacity(0.8)),
+            style: textTheme.bodyLarge?.copyWith(color: color.onSurface.withValues(red: 0.7)),
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           actions: <Widget>[
@@ -60,6 +60,7 @@ class _AdminDashboardMenuState extends State<AdminDashboardMenu> {
                 await authProvider.logout(); // Çıkış işlemini yap
                 // Giriş ekranına MaterialPageRoute ile geri dön
                 Navigator.pushReplacement(
+                  // ignore: use_build_context_synchronously
                   context,
                   MaterialPageRoute(builder: (_) => const LoginView()),
                 );

@@ -7,8 +7,8 @@ import '../models/sales_record_model.dart'; // <<< YENİ: SalesRecord modelini i
 
 class OrderProvider with ChangeNotifier {
   List<OrderItem> _selectedItems = []; // Masadaki tüm sipariş öğeleri
-  List<OrderItem> _selectedItemsForPayment = []; // Ödeme için seçilen öğeler
-  List<OrderItem> _selectedItemsForTransfer = []; // Taşıma için seçilen öğeler
+  final List<OrderItem> _selectedItemsForPayment = []; // Ödeme için seçilen öğeler
+  final List<OrderItem> _selectedItemsForTransfer = []; // Taşıma için seçilen öğeler
   
   double _totalPrice = 0.0; // Tüm masanın toplamı
   double _totalPaidAmount = 0.0; // Masada ödenen toplam tutar
@@ -43,8 +43,8 @@ class OrderProvider with ChangeNotifier {
 
   // _calculateTotals metodunun notifyListeners'ı conditional hale getirildi
   void _calculateTotals({bool shouldNotify = true}) {
-    _totalPrice = _selectedItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
-    _totalPaidAmount = _selectedItems.where((item) => item.status == 'completed').fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+    _totalPrice = _selectedItems.fold(0.0, (sum1, item) => sum1 + (item.price * item.quantity));
+    _totalPaidAmount = _selectedItems.where((item) => item.status == 'completed').fold(0.0, (sum1, item) => sum1 + (item.price * item.quantity));
     if (shouldNotify) {
       _safeNotifyListeners();
     }
@@ -95,7 +95,7 @@ class OrderProvider with ChangeNotifier {
 
   // Belirli bir öğe listesinin toplam fiyatını hesaplar (ödeme dialogu için kullanılabilir)
   double calculateTotalPrice(List<OrderItem> items) {
-    return items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+    return items.fold(0.0, (sum1, item) => sum1 + (item.price * item.quantity));
   }
 
   // addProduct artık her zaman yeni bir OrderItem ekler (uniqueId ile)
@@ -198,7 +198,7 @@ class OrderProvider with ChangeNotifier {
 
       if (querySnapshot.docs.isNotEmpty) {
         final doc = querySnapshot.docs.first;
-        final order = OrderModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        final order = OrderModel.fromMap(doc.id, doc.data());
         _selectedItems = List<OrderItem>.from(order.items);
         _currentOrderId = order.id;
         _currentOrderModel = order;
@@ -212,7 +212,6 @@ class OrderProvider with ChangeNotifier {
       _calculateTotals();
     } catch (e) {
       _message = "Masa siparişi yüklenirken hata oluştu: $e";
-      print(_message);
     } finally {
       _isLoading = false;
       _safeNotifyListeners();
@@ -354,7 +353,6 @@ class OrderProvider with ChangeNotifier {
       _message = "Ödeme başarıyla tamamlandı: ${paidAmountForThisTransaction.toStringAsFixed(2)} ₺";
     } catch (e) {
       _message = "Ödeme işlemi sırasında hata oluştu: $e";
-      print(_message);
     } finally {
       _isLoading = false;
       _safeNotifyListeners();
@@ -454,7 +452,6 @@ class OrderProvider with ChangeNotifier {
     } catch (e) {
       _message = "Masa taşıma işlemi sırasında hata oluştu: $e";
       onError(_message!);
-      print("Masa taşıma hatası: $e");
     } finally {
       _isLoading = false;
       _safeNotifyListeners();

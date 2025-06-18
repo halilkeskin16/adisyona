@@ -66,28 +66,27 @@ class _LoginViewState extends State<LoginView> {
       // Kullanıcı rolüne göre farklı ekranlara yönlendirme
       if (user.role == "super_admin") {
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (_) => const SuperAdminDashboard()),
         );
       } else if (user.role == "admin" || user.role == "garson") {
-        // Admin ise şirket aboneliği geçerliliğini kontrol et
         final isValid = await authProvider.isCompanyValid(user.companyId!);
-
         if (!isValid) {
-          // Abonelik süresi dolmuşsa ilgili ekrana yönlendir
           Navigator.pushReplacement(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(builder: (_) => const SubscriptionExpiredScreen()),
           );
         } else {
-          // Abonelik geçerliyse Admin Dashboard'a yönlendir
           Navigator.pushReplacement(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(builder: (_) => const AdminDashboardMenu()),
           );
         }
       } else {
-        // Tanımlanmamış rol durumunda hata mesajı
+
         setState(() => _errorMessage = "Yetkisiz kullanıcı rolü.");
       }
     } catch (e) {
@@ -180,25 +179,26 @@ class _LoginViewState extends State<LoginView> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        prefixIcon: icon != null ? Icon(icon, color: Theme.of(context).colorScheme.primary.withOpacity(0.7)) : null,
+        prefixIcon: icon != null ? Icon(icon, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)) : null,
+        prefixIconConstraints: icon != null ? const BoxConstraints(minWidth: 32, minHeight: 32) : null, // Prefix icon genislik ve yukseklik sınırı(0.7)) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12), // Yuvarlatılmış kenarlar
           borderSide: BorderSide.none, // Kenarlık çizgisini kaldır
         ),
         filled: true, // Alanın arka planını doldur
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5), // Daha yumuşak arka plan rengi
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5), // Daha yumuşak arka plan rengi
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
         ),
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
-        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -212,7 +212,7 @@ class _LoginViewState extends State<LoginView> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.error.withOpacity(0.1),
+        color: colorScheme.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: colorScheme.error,

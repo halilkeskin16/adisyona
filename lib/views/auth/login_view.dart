@@ -42,23 +42,24 @@ class _LoginViewState extends State<LoginView> {
     final result = await authProvider.signIn(identifier, password);
 
     if (!mounted) return;
-
-    // Başarılı giriş sonrası yönlendirme
     switch (result) {
       case AuthResult.success:
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (_) => const AdminDashboardMenu()),
         );
         break;
       case AuthResult.successSuperAdmin:
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (_) => const SuperAdminDashboard()),
         );
         break;
       case AuthResult.subscriptionExpired:
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (_) => const SubscriptionExpiredScreen()),
         );
@@ -99,7 +100,7 @@ class _LoginViewState extends State<LoginView> {
                     // Marka Logosu
                     Icon(
                       Icons.receipt_long,
-                      size: 60,
+                      size: 80,
                       color: colorScheme.primary,
                     ),
                     const SizedBox(height: 16),
@@ -127,7 +128,7 @@ class _LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -153,20 +154,7 @@ class _LoginViewState extends State<LoginView> {
                             obscureText: true,
                             enabled: !authProvider.isLoading,
                           ),
-                          const SizedBox(height: 12),
-
-                          // Şifremi Unuttum Butonu
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                // TODO: Şifremi unuttum özelliği
-                              },
-                              child: const Text("Şifremi Unuttum?"),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          
+                          const SizedBox(height: 20),          
                           // Hata Mesajı
                           if (authProvider.errorMessage != null)
                             Padding(
@@ -193,7 +181,6 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  /// Modern ve yeniden tasarlanmış TextField oluşturucu.
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -253,7 +240,6 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  /// Modern ve yeniden tasarlanmış Giriş Butonu.
   Widget _buildLoginButton({
     required BuildContext context,
     required bool isLoading,

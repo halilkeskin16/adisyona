@@ -2,15 +2,17 @@ import 'package:adisyona/providers/order_provider.dart';
 import 'package:adisyona/providers/product_provider.dart';
 import 'package:adisyona/providers/reports_provider.dart';
 import 'package:adisyona/providers/staff_provider.dart';
+import 'package:adisyona/providers/super_admin_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'views/auth/login_view.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   timeago.setLocaleMessages('tr', timeago.TrMessages());
@@ -38,6 +40,9 @@ class AdisyonaApp extends StatelessWidget {
                 Provider.of<AuthProvider>(context, listen: false),
               ),
           update: (context, auth, previousStaff) => StaffProvider(auth),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SuperAdminProvider(),
         ),
       ],
       child: MaterialApp(

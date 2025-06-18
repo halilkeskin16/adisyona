@@ -1,6 +1,5 @@
-// providers/auth_provider.dart
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart'; // Model yolunuzu doğrulayın
 import '../services/auth_service.dart'; // Servis yolunuzu doğrulayın
@@ -133,8 +132,9 @@ class AuthProvider with ChangeNotifier {
       return DateTime.now().isBefore(validUntil);
 
     } catch (e) {
-      // Hata durumunda güvenli tarafta kalıp geçersiz sayalım.
-      print("Firma geçerlilik kontrolü hatası: $e");
+      if (kDebugMode) {
+        print("Firma geçerlilik kontrolü hatası: $e");
+      }
       return false;
     }
   }

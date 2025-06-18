@@ -42,6 +42,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
         _staffNameController.clear();
         _staffPhoneController.clear();
         _staffPasswordController.clear();
+        // ignore: use_build_context_synchronously
         FocusScope.of(context).unfocus();
       }
     });
@@ -125,7 +126,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  Divider(color: colorScheme.onSurface.withOpacity(0.2), thickness: 1),
+                  Divider(color: colorScheme.onSurface.withValues(alpha: 0.1), thickness: 1),
                   const SizedBox(height: 20),
 
                   Text(
@@ -161,7 +162,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
             "Henüz kayıtlı personel bulunmamaktadır.",
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
           ),
         ),
@@ -205,18 +206,18 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
-        prefixIcon: icon != null ? Icon(icon, color: colorScheme.primary.withOpacity(0.7)) : null,
+        labelStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.7)),
+        prefixIcon: icon != null ? Icon(icon, color: colorScheme.primary.withValues(alpha: 0.7)) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceContainer.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainer.withValues(alpha: 0.1),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.2), width: 1),
+          borderSide: BorderSide(color: colorScheme.outline.withValues(alpha: 0.2), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -240,7 +241,7 @@ class _StaffManagementScreenState extends State<StaffManagementScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: messageColor.withOpacity(0.1),
+        color: messageColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: messageColor, width: 1),
       ),

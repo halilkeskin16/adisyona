@@ -153,7 +153,7 @@ class _KitchenScreenState extends State<KitchenScreen> {
                 child: Text(
                   "Şu anda hazırlanmayı bekleyen sipariş yok. 🧑‍🍳",
                   textAlign: TextAlign.center,
-                  style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.6)),
+                  style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
               );
             }
@@ -261,7 +261,7 @@ class _OrderCardState extends State<OrderCard> {
                 Text(
                   "⏱️ ${timeago.format(order.createdAt?.toDate() ?? DateTime.now(), locale: 'tr')}",
                   style: textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.6),
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -302,7 +302,7 @@ class _OrderCardState extends State<OrderCard> {
                           "Not: ${item.note}",
                           style: textTheme.bodySmall?.copyWith(
                             fontStyle: FontStyle.italic,
-                            color: colorScheme.onSurface.withOpacity(0.7),
+                            color: colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ),

@@ -1,4 +1,4 @@
-import 'package:adisyona/views/dashboard/admin_dashboard.dart';
+import 'package:adisyona/views/dashboard/area_table_management_screen.dart';
 import 'package:adisyona/views/kitchen/kitchen_screen.dart';
 import 'package:adisyona/views/order/order_table_selection_screen.dart';
 import 'package:adisyona/views/personel/personel_managment_screen.dart';
@@ -92,7 +92,7 @@ class _AdminDashboardMenuState extends State<AdminDashboardMenu> {
         icon: Icons.chair_alt_outlined,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const AdminDashboard()),
+          MaterialPageRoute(builder: (_) => const AreaTableManagementScreen()),
         ),
         requiredRole: 'admin', // Sadece adminler görebilir
       ),

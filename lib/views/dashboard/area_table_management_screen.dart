@@ -5,14 +5,14 @@ import '../../models/area_model.dart'; // Mevcut AreaModel'ınızın yolu
 import '../../models/table_model.dart'; // Mevcut TableModel'ınızın yolu
 import '../../providers/auth_provider.dart'; // Mevcut AuthProvider'ınızın yolu
 
-class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+class AreaTableManagementScreen extends StatefulWidget {
+  const AreaTableManagementScreen({super.key});
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AreaTableManagementScreen> createState() => _AreaTableManagementScreenState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _AreaTableManagementScreenState extends State<AreaTableManagementScreen> {
   // Metin kontrolcüleri ve durum değişkenleri
   final TextEditingController _areaNameController = TextEditingController();
   final TextEditingController _tableNameController = TextEditingController();

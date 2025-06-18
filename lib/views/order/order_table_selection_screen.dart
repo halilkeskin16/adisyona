@@ -18,7 +18,7 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
   List<Area> _areas = [];
   List<TableModel> _tables = [];
   String _selectedAreaId = 'all';
-  Map<String, double> _tableOrders = {}; // Masa ID'si -> Toplam Sipariş Tutarı
+  Map<String, double> _tableOrders = {};
 
   @override
   void initState() {
@@ -47,18 +47,14 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
           .where('companyId', isEqualTo: user.companyId)
           .where('status', whereIn: ['pending', 'preparing', 'ready'])
           .get();
-
-      // Her masa için toplam sipariş tutarını hesapla
       Map<String, double> tableOrders = {};
       for (var doc in ordersSnap.docs) {
         final data = doc.data();
         final tableId = data['tableId'] as String;
-        // totalAmount null olabilir, bu durumda items'dan hesapla
         double totalAmount = 0.0;
         if (data['totalAmount'] != null) {
           totalAmount = (data['totalAmount'] as num).toDouble();
         } else if (data['items'] != null) {
-          // Eğer totalAmount yoksa items'dan hesapla
           final items = data['items'] as List;
           totalAmount = items.fold(0.0, (sum1, item) {
             final price = (item['price'] as num).toDouble();
@@ -86,23 +82,20 @@ class _OrderTableSelectionScreenState extends State<OrderTableSelectionScreen> {
 
   Color _getTableColor(String tableId) {
     if (_tableOrders.containsKey(tableId)) {
-      // Sipariş varsa kırmızı tonları
       return Colors.red.shade100;
     }
-    // Sipariş yoksa yeşil tonları
     return Colors.green.shade100;
   }
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sipariş – Masa Seçimi"),
+        title: const Text("Sipariş – Masa Seçimi" , style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold),),
         centerTitle: true,
-        backgroundColor: colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

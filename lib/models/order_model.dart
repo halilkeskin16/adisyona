@@ -90,7 +90,25 @@ class OrderItem {
     this.status,
     this.note,
   }) : uniqueId = uniqueId ?? const Uuid().v4();
-
+    OrderItem copyWith({
+    String? uniqueId,
+    String? productId,
+    String? name,
+    double? price,
+    int? quantity,
+    String? status,
+    String? note,
+  }) {
+    return OrderItem(
+      uniqueId: uniqueId ?? this.uniqueId,
+      productId: productId ?? this.productId,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
+      status: status ?? this.status,
+      note: note ?? this.note,
+    );
+  }
   factory OrderItem.fromMap(Map<String, dynamic> map) {
     return OrderItem(
       uniqueId: map['uniqueId'] as String? ?? const Uuid().v4(),
